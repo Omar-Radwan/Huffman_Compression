@@ -60,6 +60,9 @@ class OutputWriter:
             bits += self.__compressed_str_char_bits(input_reader.buffer, huffman_codes)
 
         char_count, readable_from_last_char = bits // 8, bits % 8
+        if (readable_from_last_char != 0):
+            char_count += 1
+
         line = str(char_count) + DELIM + str(readable_from_last_char) + DELIM
 
         self.file.write(line)

@@ -3,8 +3,6 @@ DELIM = ','
 ENCODING = "latin_1"
 
 
-
-
 # def count_char_frequency(file_name: str) -> dict:
 #     frequency: dict = {}
 #     file = open(file_name, "r")
@@ -30,9 +28,11 @@ def list_to_ascii(x: []):
         pow2 *= 2
     return result
 
-def char_to_ascii(x: str):
-    result, pow2 = 0, 1
-    for i in range(len(x) - 1, -1, -1):
-        result += pow2 * x[i]
-        pow2 *= 2
-    return result
+
+def char_to_ascii(x: str) -> str:
+    """
+    :param x: some character
+    :return: binary representation of the input character
+    """
+    val = ord(x)
+    return '{0:08b}'.format(val)
