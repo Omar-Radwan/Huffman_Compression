@@ -1,14 +1,18 @@
 KB_SIZE = 1024
+DELIM = ','
+ENCODING = "latin_1"
 
 
-def count_char_frequency(file_name: str) -> dict:
-    frequency: dict = {}
-    file = open(file_name, "r")
-    for line in file:
-        for character in line:
-            frequency[character] = frequency.get(character, 0) + 1
-    return frequency
 
+
+# def count_char_frequency(file_name: str) -> dict:
+#     frequency: dict = {}
+#     file = open(file_name, "r")
+#     for line in file:
+#         for character in line:
+#             frequency[character] = frequency.get(character, 0) + 1
+#     return frequency
+#
 
 def total_number_of_bits(frequency: dict, huffman_code: dict):
     total_bits_number = 0

@@ -6,7 +6,7 @@ from collections import deque
 
 class Decoder:
     def __init__(self, inpute_file_name: str, output_file_name: str):
-        self.input_reader = InputReader(inpute_file_name)
+        self.input_reader = InputReader(inpute_file_name, True)
         self.output_writer = OutputWriter(output_file_name)
 
     def build_decode_tree(self, huffman_codes: dict):
@@ -36,13 +36,18 @@ class Decoder:
             deque.appendleft(self.input_reader.buffer, removed)
         return result
 
-
-# A101011111010101010101010101010101010 101
-
-def decode_file(self):
-    while not self.input_reader.file_ended():
-        self.input_reader.fill_buffer()
-        character = self.read_character(self.decode_root)
-        while character != None:
-            self.output_writer.write_to_file(character)
-            character = self.read_character(self.decode_root)
+    def decode_file(self):
+        read_so_far = 0
+        huffman_codes, read_so_far = self.input_reader.read_meta_data(read_so_far)
+        self.build_decode_tree(huffman_codes)
+        # dowhile
+        path, read_so_far = self.input_reader.read_path(read_so_far)
+        while len(path) > 0:
+            number_of_compressed, number_of_last_bits = self.input_reader.read_compression_details(read_so_far)
+            while self.input_reader.fill_limited_buffer(read_so_far, max(0, number_of_compressed)):
+                character = self.read_character(self.decode_root)
+                while character != None:
+                    self.output_writer.write_to_file(character)
+                    character = self.read_character(self.decode_root)
+                number_of_compressed -= len(self.input_reader.buffer)
+            path, read_so_far = self.input_reader.read_path(read_so_far)

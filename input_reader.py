@@ -1,26 +1,94 @@
+from collections import deque
+from misc import *
+
+
 class InputReader:
-    def __init__(self, file_name):
+    def __init__(self, file_name, is_decode):
         self.buffer = []
         self.file_name = file_name
+        self.file = open(self.file_name, "r")
+        if is_decode:
+            self.line = self.file.read()
 
-    def read_meta_data(self):
-        file = open("output.txt", "r")
-        number_of_codes = int(file.readline(1))
-        # print(k)
-        huffman_codes = {}
-        for line in file:
-            if number_of_codes == 0:
-                break
-            info = line.split(" ")
-            key = info[0]
-            value = info[1].split('\n')
-            huffman_codes[value[0]] = key
-            number_of_codes -= 1
-        file.close()
-        print(huffman_codes)
+    def read_compression_details(self, i):
+        # get compressedDataCharacters
+        compressedCharactersString = ""
+        while self.line[i] != ",":
+            compressedCharactersString += str(self.line[i])
+            i += 1
+        compressedCharacters = int(compressedCharactersString)
+        print(compressedCharacters)
+        # get number of bits to read from last character
+        i += 1
+        lastBitsToReadString = ""
+        while self.line[i] != ",":
+            lastBitsToReadString += self.line[i]
+            i += 1
+        lastBitsToRead = int(lastBitsToReadString)
+        print(lastBitsToRead)
+        return compressedCharacters, lastBitsToRead
 
-    def fill_buffer(self):
-        pass
+    def read_path(self, i):
+        # number of characters in path
+        # file = open(self.file_name, "r")
+        huffmanCodes = {}
+        # line = file.read()
+        pathCharactersString = ""
+        while self.line[i] != ",":
+            pathCharactersString += str(self.line[i])
+            i += 1
+        pathCharacters = int(pathCharactersString)
+        print(pathCharacters)
+        # get path
+        i += 1
+        path = ""
+        while pathCharacters != 0:
+            path += str(self.line[i])
+            i += 1
+            pathCharacters -= 1
+        print(path)
+        return path, i
 
-    def file_ended(self):
-        return False
+    def read_meta_data(self, i) -> ({}, int):
+        # 13 k01 c0 d2222 9
+        # fileName = "output.txt"
+        # file = open(self.file_name, "r")
+        huffmanCodes = {}
+        # line = file.read()
+        # get number of huffmanCodesCharacters
+        huffmanCharactersString = ""
+        while self.line[i] != DELIM:
+            huffmanCharactersString += str(self.line[i])
+            i += 1
+        huffmanCharacters = int(huffmanCharactersString)
+        i += 1
+        while huffmanCharacters != 0:
+            key = self.line[i]
+            value = ""
+            i += 1
+            huffmanCharacters -= 1
+            while self.line[i] != " ":
+                value += self.line[i]
+                i += 1
+                huffmanCharacters -= 1
+            huffmanCharacters -= 1
+            huffmanCodes[key] = value
+            i += 1
+        print(huffmanCodes)
+        return huffmanCodes, i
+
+    def fill_buffer(self, is_clear=True):
+        if (is_clear):
+            self.buffer.clear()
+        read_str = self.file.read(KB_SIZE - len(self.buffer))
+        for c in read_str:
+            self.buffer.append(c)
+        return len(read_str) != 0
+
+    def fill_limited_buffer(self, read_so_far, total_number_of_characters, is_clear=True):
+        if (is_clear):
+            self.buffer.clear()
+        read_str = self.line[read_so_far:min(KB_SIZE, total_number_of_characters)]
+        for c in read_str:
+            self.buffer.append(c)
+        return len(read_str) != 0
