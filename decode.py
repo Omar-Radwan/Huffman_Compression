@@ -5,9 +5,8 @@ from collections import deque
 
 
 class Decoder:
-    def __init__(self, inpute_file_name: str, output_file_name: str):
-        self.input_reader = InputReader(inpute_file_name, True)
-        self.output_writer = OutputWriter(output_file_name)
+    def __init__(self, inpute_file_name: str):
+        self.input_reader = InputReader(inpute_file_name)
 
     def inorder(self, node: DecodeNode):
         if not node:
@@ -37,31 +36,33 @@ class Decoder:
                 node.right = DecodeNode()
             self.__add_node_in_decode_tree(pos_in_code + 1, code, node.right, character)
 
-    def read_character(self, node: DecodeNode):
+    def read_character(self, i, bits, node: DecodeNode):
         if node.character != None:
-            return node.character
-        if len(self.input_reader.buffer) == 0:
-            return None
-        #removed = deque.popleft(self.input_reader.buffer)
-        removed = self.input_reader.buffer.popleft()
-        result = self.read_character(node.left) if removed == '0' else self.read_character(node.right)
-        if result == None:
-            self.input_reader.buffer.appendleft(removed)
-        return result
+            return node.character, i
+        return self.read_character(i + 1, bits, node.left) if (bits[i] == '0') else self.read_character(i + 1, bits,
+                                                                                                        node.right)
 
     def decode_file(self):
         read_so_far = 0
         huffman_codes, read_so_far = self.input_reader.read_meta_data(read_so_far)
         self.build_decode_tree(huffman_codes)
         self.inorder(self.decode_root)
+
         # dowhile
         path, read_so_far = self.input_reader.read_path(read_so_far)
         while len(path) > 0:
-            number_of_compressed, number_of_last_bits, read_so_far= self.input_reader.read_compression_details(read_so_far)
-            while self.input_reader.fill_limited_buffer(read_so_far, max(0, number_of_compressed)):
-                character = self.read_character(self.decode_root)
-                while character != None:
-                    self.output_writer.write_to_file(character)
-                    character = self.read_character(self.decode_root)
-                number_of_compressed -= len(self.input_reader.buffer)
-            path, read_so_far = self.input_reader.read_path(read_so_far)
+            output_writer = OutputWriter(f'dadaoda{path}')
+            compressed_length, last_bits, read_so_far = self.input_reader.read_compression_details(
+                read_so_far)
+            bits, read_so_far = self.input_reader.get_compressed_bits(read_so_far, compressed_length, last_bits)
+            index_in_bits = 0
+            character, index_in_bits = self.read_character(index_in_bits, bits, self.decode_root)
+            output_writer.write_to_file(character)
+            while index_in_bits < len(bits):
+                character, index_in_bits = self.read_character(index_in_bits, bits, self.decode_root)
+                output_writer.write_to_file(character)
+            output_writer.close()
+            if read_so_far < len(self.input_reader.text):
+                path, read_so_far = self.input_reader.read_path(read_so_far)
+            else:
+                path, read_so_far = "", read_so_far

@@ -3,4 +3,4 @@ from pathlib import Path
 
 from misc import *
 
-print(char_to_ascii('°'))
+print(char_to_binary('°'))

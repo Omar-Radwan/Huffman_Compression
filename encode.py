@@ -44,9 +44,8 @@ class Encoder:
 
     def encode(self):
         for file_name in self.input_file_names:
-            input_reader = InputReader(file_name, False)
-            while input_reader.fill_buffer():
-                self.count_char_frequency(input_reader.buffer)
+            input_reader = InputReader(file_name)
+            self.count_char_frequency(input_reader.text)
 
         if len(self.frequency) > 1:
             root_node = self.build_huffman_tree()

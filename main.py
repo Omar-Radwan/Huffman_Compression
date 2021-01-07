@@ -17,7 +17,7 @@ def dada(path:str):
 if __name__ == '__main__':
     encoder = Encoder(["input.txt"], "output.txt")
     encoder.encode()
-    decoder = Decoder("output.txt", "decoded.txt")
+    decoder = Decoder("output.txt")
     decoder.decode_file()
 
 
