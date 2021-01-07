@@ -11,6 +11,8 @@ class InputReader:
             self.line = self.file.read()
 
     def read_compression_details(self, i):
+        if i >= len(self.line):
+            return (float('inf'), float('inf'), i)
         # get compressedDataCharacters
         compressedCharactersString = ""
         while self.line[i] != ",":
@@ -29,6 +31,8 @@ class InputReader:
         return compressedCharacters, lastBitsToRead, i+1
 
     def read_path(self, i):
+        if i >= len(self.line):
+            return ('', i)
         # number of characters in path
         # file = open(self.file_name, "r")
         huffmanCodes = {}
@@ -93,4 +97,4 @@ class InputReader:
         for c in read_str:
             for x in char_to_ascii(c):
                 self.buffer.append(x)
-        return len(read_str) != 0
+        return len(read_str) != 0, read_so_far + len(read_str)

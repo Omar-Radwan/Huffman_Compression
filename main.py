@@ -7,6 +7,8 @@ import ast
 from output_writer import OutputWriter
 from encode import Encoder
 import os
+
+
 def dada(path:str):
     fname = []
     for root, directoryNames, fileNames in os.walk(path):
@@ -14,8 +16,13 @@ def dada(path:str):
             fname.append(os.path.join(root, file))
     print(fname)
     return fname
+
+
 if __name__ == '__main__':
-    encoder = Encoder(["input.txt"], "output.txt")
+    # choice = int(input('1 - File\n2 - Folder\n'))
+    # input_data = ['input.txt'] if choice == 1 else dada('./dir')
+    # decoded_data =
+    encoder = Encoder(['input.txt'], "output.txt")
     encoder.encode()
     decoder = Decoder("output.txt", "decoded.txt")
     decoder.decode_file()

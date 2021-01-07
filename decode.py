@@ -44,7 +44,11 @@ class Decoder:
             return None
         #removed = deque.popleft(self.input_reader.buffer)
         removed = self.input_reader.buffer.popleft()
-        result = self.read_character(node.left) if removed == '0' else self.read_character(node.right)
+        #result = self.read_character(node.left) if removed == '0' else self.read_character(node.right)
+        if removed == '0':
+            result = self.read_character(node.left)
+        else:
+            result = self.read_character(node.right)
         if result == None:
             self.input_reader.buffer.appendleft(removed)
         return result
@@ -58,10 +62,13 @@ class Decoder:
         path, read_so_far = self.input_reader.read_path(read_so_far)
         while len(path) > 0:
             number_of_compressed, number_of_last_bits, read_so_far= self.input_reader.read_compression_details(read_so_far)
-            while self.input_reader.fill_limited_buffer(read_so_far, max(0, number_of_compressed)):
+            buffer_not_empty, read_so_far = self.input_reader.fill_limited_buffer(read_so_far, max(0, number_of_compressed))
+            while buffer_not_empty:
                 character = self.read_character(self.decode_root)
                 while character != None:
                     self.output_writer.write_to_file(character)
                     character = self.read_character(self.decode_root)
                 number_of_compressed -= len(self.input_reader.buffer)
+                buffer_not_empty, read_so_far = self.input_reader.fill_limited_buffer(read_so_far, max(0, number_of_compressed))
             path, read_so_far = self.input_reader.read_path(read_so_far)
+        self.output_writer.close()

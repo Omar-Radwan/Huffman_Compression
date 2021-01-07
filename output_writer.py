@@ -18,6 +18,7 @@ class OutputWriter:
         else:
             self.output_buffer.append(character)
             self.file.write("".join(self.output_buffer))
+
             self.output_buffer.clear()
 
     def write_meta_data(self, huffman_codes: dict):
@@ -88,4 +89,5 @@ class OutputWriter:
         print(f'time= {te - ts}')
 
     def close(self):
+        self.file.write("".join(self.output_buffer))
         self.file.close()
