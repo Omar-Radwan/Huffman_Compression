@@ -46,7 +46,7 @@ class Decoder:
         removed = self.input_reader.buffer.popleft()
         result = self.read_character(node.left) if removed == '0' else self.read_character(node.right)
         if result == None:
-            deque.appendleft(self.input_reader.buffer, removed)
+            self.input_reader.buffer.appendleft(removed)
         return result
 
     def decode_file(self):

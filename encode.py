@@ -58,7 +58,7 @@ class Encoder:
         for file_name in self.input_file_names:
             self.output_writer.write_path(file_name)
             self.output_writer.write_compressed_data(self.huffman_codes, file_name)
-
+        self.output_writer.close()
         """
             Compressed File:
                 1.no. of characters in huffman codes+huffman codes     

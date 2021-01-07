@@ -91,5 +91,6 @@ class InputReader:
         #read_str = self.line[read_so_far:min(KB_SIZE, total_number_of_characters)]
         read_str = self.line[read_so_far:]
         for c in read_str:
-            self.buffer.append(str(ascii(c)))
+            for x in char_to_ascii(c):
+                self.buffer.append(x)
         return len(read_str) != 0

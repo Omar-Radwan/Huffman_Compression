@@ -15,10 +15,10 @@ def dada(path:str):
     print(fname)
     return fname
 if __name__ == '__main__':
-    # encoder = Encoder(["input.txt"], "output.txt")
-    # encoder.encode()
-    # decoder = Decoder("output.txt", "decoded.txt")
-    # decoder.decode_file()
+    encoder = Encoder(["input.txt"], "output.txt")
+    encoder.encode()
+    decoder = Decoder("output.txt", "decoded.txt")
+    decoder.decode_file()
 
 
 
