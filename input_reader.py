@@ -3,8 +3,8 @@ from misc import *
 
 
 class InputReader:
-    def __init__(self, file_name, is_decode):
-        self.buffer = []
+    def __init__(self, file_name, is_decode=True):
+        self.buffer = deque([])
         self.file_name = file_name
         self.file = open(self.file_name, "r")
         if is_decode:
@@ -26,7 +26,7 @@ class InputReader:
             i += 1
         lastBitsToRead = int(lastBitsToReadString)
         print(lastBitsToRead)
-        return compressedCharacters, lastBitsToRead
+        return compressedCharacters, lastBitsToRead, i+1
 
     def read_path(self, i):
         # number of characters in path
@@ -67,12 +67,12 @@ class InputReader:
             value = ""
             i += 1
             huffmanCharacters -= 1
-            while self.line[i] != " ":
+            while self.line[i] != DELIM:
                 value += self.line[i]
                 i += 1
                 huffmanCharacters -= 1
             huffmanCharacters -= 1
-            huffmanCodes[key] = value
+            huffmanCodes[value] = key
             i += 1
         print(huffmanCodes)
         return huffmanCodes, i
@@ -88,7 +88,8 @@ class InputReader:
     def fill_limited_buffer(self, read_so_far, total_number_of_characters, is_clear=True):
         if (is_clear):
             self.buffer.clear()
-        read_str = self.line[read_so_far:min(KB_SIZE, total_number_of_characters)]
+        #read_str = self.line[read_so_far:min(KB_SIZE, total_number_of_characters)]
+        read_str = self.line[read_so_far:]
         for c in read_str:
-            self.buffer.append(c)
+            self.buffer.append(str(ascii(c)))
         return len(read_str) != 0

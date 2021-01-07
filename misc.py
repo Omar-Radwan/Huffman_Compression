@@ -29,3 +29,10 @@ def list_to_ascii(x: []):
         result += pow2 * x[i]
         pow2 *= 2
     return result
+
+def char_to_ascii(x: str):
+    result, pow2 = 0, 1
+    for i in range(len(x) - 1, -1, -1):
+        result += pow2 * x[i]
+        pow2 *= 2
+    return result

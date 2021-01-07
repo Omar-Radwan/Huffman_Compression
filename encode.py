@@ -6,7 +6,7 @@ from output_writer import OutputWriter
 
 
 class Encoder:
-    def __init__(self, input_file_names: str, output_file_name: str):
+    def __init__(self, input_file_names, output_file_name: str):
         self.input_file_names = input_file_names
         self.output_writer = OutputWriter(output_file_name)
         self.frequency = {}

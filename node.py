@@ -11,8 +11,8 @@ class HuffmanNode:
 
 
 class DecodeNode:
-    def __init__(self, character=None, left=None, right=None):
+    def __init__(self, character=None, left=None, right=None, code=""):
         self.character = character
         self.left = left
         self.right = right
-    
+        self.code = code
