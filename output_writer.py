@@ -9,75 +9,68 @@ class OutputWriter:
 
     def __init__(self, file_name: str):
         self.file_name = file_name
-
-        self.txt_list = []
+        self.file = open(self.file_name, "w", newline='', encoding=ENCODING)
+        self.text_list = []
 
     def write_to_file(self, character: str):
-        self.txt_list.append(character)
+        self.text_list.append(character)
+        if (len(self.text_list) >= 50 * KB_SIZE):
+            self.file.write("".join(self.text_list))
+            self.text_list = []
 
-    def write_meta_data(self, huffman_codes: dict):
+    def write_huffman_codes(self, huffman_codes: dict):
         pairs_list = []
         for key, value in huffman_codes.items():
             pairs_list.append(key + value + DELIM)
-        char_count = self.__huffman_codes_car_length(huffman_codes)
-        pairs_line = str(char_count) + DELIM + "".join(pairs_list)
+        length = self.__huffman_codes_length(huffman_codes)
+        pairs_line = str(length) + DELIM + "".join(pairs_list)
         self.write_to_file(pairs_line)
 
-    def __huffman_codes_car_length(self, huffman_codes: dict):
-        sum = 2 * len(huffman_codes)
-        for value in huffman_codes.values():
-            sum += len(value)
-        return sum
+    def __huffman_codes_length(self, huffman_codes: dict):
+        return 2 * len(huffman_codes) + sum(len(value) for value in huffman_codes.values())
 
     def write_path(self, path: str):
-        line = str(len(path)) + DELIM + path
+        line = "".join([str(len(path)), DELIM, path])
         self.write_to_file(line)
 
-    def __compressed_str_char_bits(self, txt: str, huffman_codes: dict):
-        result = 0
-        for c in txt:
-            result += len(huffman_codes[c])
-        return result
+    def __compressed_bits_length(self, text: str, huffman_codes: dict):
+        return sum(len(huffman_codes[c]) for c in text)
 
     def __compress_bits_to_chars(self, buffer_dq: deque):
         while len(buffer_dq) >= 8:
-            byte_binary = [buffer_dq.popleft() for i in range(8)]
-            ascii_code = list_to_ascii(byte_binary)
-
-            out_char = chr(ascii_code)
-            self.write_to_file(out_char)
+            ascii_code = sum(buffer_dq.popleft() * (1 << (7 - i)) for i in range(8))
+            self.write_to_file(chr(ascii_code))
 
     def write_compressed_data(self, huffman_codes: dict, file_name: str):
         input_reader = InputReader(file_name)
-        bits = 0
-
-        bits += self.__compressed_str_char_bits(input_reader.text, huffman_codes)
-
-        char_count, readable_from_last_char = bits // 8, bits % 8
-
+        input_reader.read_whole_file()
+        bits_length = self.__compressed_bits_length(input_reader.text, huffman_codes)
+        char_count, readable_from_last_char = bits_length // 8, bits_length % 8
 
         if (readable_from_last_char != 0):
             char_count += 1
+
         if readable_from_last_char == 0:
             readable_from_last_char = 8
-        line = str(char_count) + DELIM + str(readable_from_last_char) + DELIM
-        self.write_to_file(line)
 
-        input_reader = InputReader(file_name)
-        buffer_dq = deque([])
+        line = "".join([str(char_count), DELIM, str(readable_from_last_char), DELIM])
+        self.write_to_file(line)
+        input_reader.close()
+
+        dq = deque([])
 
         for character in input_reader.text:
             code = huffman_codes[character]
             for bit in code:
-                buffer_dq.append(int(bit))
-                self.__compress_bits_to_chars(buffer_dq)
+                dq.append(int(bit))
+                self.__compress_bits_to_chars(dq)
 
-        if len(buffer_dq) > 0:
-            while len(buffer_dq) != 8:
-                buffer_dq.append(0)
-            self.__compress_bits_to_chars(buffer_dq)
+        if len(dq) > 0:
+            while len(dq) != 8:
+                dq.append(0)
+            self.__compress_bits_to_chars(dq)
+        input_reader.close()
 
     def close(self):
-        file = open(self.file_name, "w",newline='', encoding=ENCODING)
-        file.write("".join(self.txt_list))
-        file.close()
+        self.file.write("".join(self.text_list))
+        self.file.close()

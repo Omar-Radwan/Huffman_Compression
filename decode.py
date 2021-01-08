@@ -36,37 +36,31 @@ class Decoder:
                 node.right = DecodeNode()
             self.__add_node_in_decode_tree(pos_in_code + 1, code, node.right, character)
 
-    def read_character(self, i, bits, node: DecodeNode):
+    def read_character(self, bits, node: DecodeNode):
         if node.character != None:
-            return node.character, i
-        return self.read_character(i + 1, bits, node.left) if (bits[i] == '0') else self.read_character(i + 1, bits,
+            return node.character
+        return self.read_character(bits, node.left) if (bits.popleft() == '0') else self.read_character(bits,
                                                                                                         node.right)
 
-    def decode_file(self):
-        read_so_far = 0
-        huffman_codes, read_so_far = self.input_reader.read_meta_data(read_so_far)
+    def decode(self):
+        huffman_codes = self.input_reader.read_meta_data()
         self.build_decode_tree(huffman_codes)
         self.inorder(self.decode_root)
+        path = self.input_reader.read_path()
 
-        # dowhile
-        path, read_so_far = self.input_reader.read_path(read_so_far)
         while len(path) > 0:
-
-            # TODO: modify the output path
             output_writer = OutputWriter(f'{path}.decoded.txt')
+            compressed_length, last_bits = self.input_reader.read_compression_lengths()
 
-            compressed_length, last_bits, read_so_far = self.input_reader.read_compression_details(
-                read_so_far)
-            bits, read_so_far = self.input_reader.get_compressed_bits(read_so_far, compressed_length, last_bits)
-            index_in_bits = 0
-            character, index_in_bits = self.read_character(index_in_bits, bits, self.decode_root)
+            bits = self.input_reader.get_compressed_bits(compressed_length, last_bits)
+
+            character = self.read_character(bits, self.decode_root)
             output_writer.write_to_file(character)
-            while index_in_bits < len(bits):
-                character, index_in_bits = self.read_character(index_in_bits, bits, self.decode_root)
+            while len(bits) > 0:
+                character = self.read_character(bits, self.decode_root)
                 output_writer.write_to_file(character)
             output_writer.close()
-            if read_so_far < len(self.input_reader.text):
-                path, read_so_far = self.input_reader.read_path(read_so_far)
-            else:
-                path, read_so_far = "", read_so_far
+            path = self.input_reader.read_path()
+
+
         self.input_reader.close()

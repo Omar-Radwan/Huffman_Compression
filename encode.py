@@ -1,4 +1,5 @@
 import heapq
+import os
 
 from input_reader import InputReader
 from node import HuffmanNode, DecodeNode
@@ -6,12 +7,23 @@ from output_writer import OutputWriter
 
 
 class Encoder:
-    def __init__(self, input_file_names, output_file_name: str):
-        self.input_file_names = input_file_names
-        self.output_writer = OutputWriter(output_file_name)
+    def __init__(self, input_path):
+        self.input_file_names = [input_path]
+        if (os.path.isdir(input_path)):
+            self.input_file_names = self.files_in_directory(input_path)
+
+        self.output_writer = OutputWriter(input_path + ".compressed.txt")
         self.frequency = {}
         self.huffman_codes = {}
         self.root_node = None
+
+    def files_in_directory(self, path: str):
+        fname = []
+        for root, directoryNames, fileNames in os.walk(path):
+            for file in fileNames:
+                fname.append(os.path.join(root, file))
+        print(fname)
+        return fname
 
     def build_huffman_tree(self):
         pq = []
@@ -28,45 +40,39 @@ class Encoder:
 
         return pq[0]
 
-    def traverse_huffman_tree(self, node: HuffmanNode, current_code: str):
+    def traverse_huffman_tree(self, node: HuffmanNode, current_code: []):
         if node == None:
             return
 
         if node.left == None and node.right == None:
-            self.huffman_codes[node.character] = current_code
-
-        self.traverse_huffman_tree(node.left, current_code.__add__('0'))
-        self.traverse_huffman_tree(node.right, current_code.__add__('1'))
+            self.huffman_codes[node.character] = ''.join(current_code)
+        current_code.append('0')
+        self.traverse_huffman_tree(node.left, current_code)
+        current_code.pop()
+        current_code.append('1')
+        self.traverse_huffman_tree(node.right, current_code)
+        current_code.pop()
 
     def count_char_frequency(self, txt: str):
         for character in txt:
             self.frequency[character] = self.frequency.get(character, 0) + 1
 
     def encode(self):
+
         for file_name in self.input_file_names:
             input_reader = InputReader(file_name)
+            input_reader.read_whole_file()
             self.count_char_frequency(input_reader.text)
+            input_reader.close()
 
         if len(self.frequency) > 1:
             root_node = self.build_huffman_tree()
-            self.traverse_huffman_tree(root_node, '')
+            self.traverse_huffman_tree(root_node, [])
         else:
             self.huffman_codes[list(self.frequency.keys())[0]] = '0'
 
-        self.output_writer.write_meta_data(self.huffman_codes)
+        self.output_writer.write_huffman_codes(self.huffman_codes)
         for file_name in self.input_file_names:
             self.output_writer.write_path(file_name)
             self.output_writer.write_compressed_data(self.huffman_codes, file_name)
         self.output_writer.close()
-        """
-            Compressed File:
-                1.no. of characters in huffman codes+huffman codes     
-                2.no. of characters in path + path 
-                3.no. of characters in compressed data|no. or bits to read from last char|compressed data
-                
-            any character that mustn't be added won't be added
-            40                              
-            number of chars to read k123 k123 k123 12 abc\\xyz\\a12 3 aksjdlkasjdlkasjdlksaalkasj        
-            size of dict = n
-            2n+sum(length of values)                             
-        """
