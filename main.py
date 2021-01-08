@@ -43,10 +43,15 @@ if __name__ == '__main__':
 
     file1 = "./input.txt"
     file2 = "./input.txt.decoded.txt"
+    sizeBeforeCompression=os.path.getsize("./input.txt")
+    sizeAfterCompression=os.path.getsize("./input.txt.compressed.txt")
+    print(sizeBeforeCompression)
+    #print(sizeAfterCompression)
+
     s1 = time.time()
     encoder = Encoder("./input.txt")
     encoder.encode()
-    decoder = Decoder('./input.txt.decoded.txt')
+    decoder = Decoder('./input.txt.compressed.txt')
     decoder.decode()
     # print(f'encode_time={time.time() - s1}')
     # s2 = time.time()
