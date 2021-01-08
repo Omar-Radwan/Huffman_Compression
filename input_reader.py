@@ -4,91 +4,72 @@ from misc import *
 
 class InputReader:
     def __init__(self, file_name):
+        self.read_so_far = 0
         self.file_name = file_name
-        self.file = open(self.file_name, "r",newline='', encoding=ENCODING)
+        self.file = open(self.file_name, "r", newline='', encoding=ENCODING)
+
+    def read_compression_lengths(self):
+        compressed_characters = self.get_length()
+        last_bits_to_read = self.get_length()
+        return compressed_characters, last_bits_to_read
+
+    def read_whole_file(self):
         self.text = self.file.read()
-        self.file.close()
 
-    def read_compression_details(self, i):
-        compressedCharacters, i = self.get_length(i)
+    def read_path(self):
+        path_characters = self.get_length()
+        path = self.file.read(path_characters)
+        self.read_so_far += path_characters
+        return path
 
-        lastBitsToReadString = ""
-        while self.text[i] != ",":
-            lastBitsToReadString += self.text[i]
-            i += 1
-        lastBitsToRead = int(lastBitsToReadString)
-        print(lastBitsToRead)
-        return compressedCharacters, lastBitsToRead, i + 1
-
-    def read_path(self, i):
-        pathCharacters, i = self.get_length(i)
-
-        path = ""
-        while pathCharacters != 0:
-            path += str(self.text[i])
-            i += 1
-            pathCharacters -= 1
-        print(path)
-        return path, i
-
-    def read_meta_data(self, i) -> ({}, int):
+    def read_meta_data(self) -> ({}, int):
         huffmanCodes = {}
-        huffmanCharacters, i = self.get_length(i)
+        huffman_characters = self.get_length()
+        end = self.read_so_far + huffman_characters
 
-        while huffmanCharacters != 0:
-            key = self.text[i]
-            value = ""
-            i += 1
-            huffmanCharacters -= 1
-            while self.text[i] != DELIM:
-                value += self.text[i]
-                i += 1
-                huffmanCharacters -= 1
-            huffmanCharacters -= 1
+        while self.read_so_far < end:
+            key = self.file.read(1)
+            self.read_so_far += 1
+            tmp = self.file.read(1)
+            value_list = []
+            while tmp != DELIM:
+                value_list.append(tmp)
+                self.read_so_far += 1
+                tmp = self.file.read(1)
+            value = "".join(value_list)
             huffmanCodes[value] = key
-            i += 1
-        print(huffmanCodes)
-        return huffmanCodes, i
+            self.read_so_far += 1
 
-    def get_length(self, i):
-        length_string = ""
-        while self.text[i] != DELIM:
-            length_string += str(self.text[i])
-            i += 1
-        length = int(length_string)
-        i += 1
-        return length, i
+        return huffmanCodes
 
-    def get_compressed_bits(self, i, count, last_bits):
-        characters = self.text[i:i + count - 1]
-        bits = []
+    def get_length(self):
+        tmp = self.file.read(1)
+        if tmp == '':
+            return 0
+
+        length_list = []
+        while tmp != DELIM:
+            length_list.append(tmp)
+            self.read_so_far += 1
+            tmp = self.file.read(1)
+        self.read_so_far += 1
+        length = int("".join(length_list))
+        return length
+
+    def get_compressed_bits(self, count, useful_bits_from_last_byte):
+        characters = self.file.read(count - 1)
+        bits = deque([])
 
         for character in characters:
             binary_string = char_to_binary(character)
             for bit in binary_string:
                 bits.append(bit)
-        # l ... r = r-l+1 = n  ... l,n -> r = l+n-1
-        binary_string = char_to_binary(self.text[i + count - 1])
-        for j in range(last_bits):
-            bits.append(binary_string[j])
-        return bits, i + count
+
+        binary_string = char_to_binary(self.file.read(1))
+        for useful_bits in range(useful_bits_from_last_byte):
+            bits.append(binary_string[useful_bits])
+        self.read_so_far += count
+        return bits
 
     def close(self):
         self.file.close()
-# def fill_buffer(self, is_clear=True):
-#     if (is_clear):
-#         self.buffer.clear()
-#     read_str = self.file.read(KB_SIZE - len(self.buffer))
-#     for c in read_str:
-#         self.buffer.append(c)
-#     return len(read_str) != 0
-#
-# def fill_limited_buffer(self, read_so_far, total_number_of_characters, is_clear=True):
-#     if (is_clear):
-#         self.buffer.clear()
-#     # read_str = self.line[read_so_far:min(KB_SIZE, total_number_of_characters)]
-#     read_str = self.text[read_so_far:]
-#     for c in read_str:
-#         for x in char_to_ascii(c):
-#             self.buffer.append(x)
-#     return len(read_str) != 0
