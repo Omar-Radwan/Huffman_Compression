@@ -55,7 +55,7 @@ if __name__ == '__main__':
     # input_data = ['input.txt'] if choice == 1 else dada('./dir')
     # decoded_data =
     # generate_testcase()
-    encoder = Encoder(dada("./dir"), "output.txt")
+    encoder = Encoder(["input.txt"], "output.txt")
     encoder.encode()
     decoder = Decoder("output.txt")
     decoder.decode_file()

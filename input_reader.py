@@ -63,6 +63,7 @@ class InputReader:
         characters = self.text[i:i + count - 1]
         bits = []
 
+
         for character in characters:
             binary_string = char_to_binary(character)
             for bit in binary_string:
