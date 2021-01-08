@@ -52,6 +52,8 @@ if __name__ == '__main__':
         print("Bad")
     else:
         print("Good")
+
+    print(encoder.compressed_chars_count)
 # encoder = Encoder(dada("./dir"), "output.txt")
 # encoder.encode()
 # decoder = Decoder("output.txt")

@@ -45,7 +45,7 @@ class OutputWriter:
         line = "".join([str(len(path)), DELIM, path])
         self.write_to_file(line)
 
-    def __compressed_bits_length(self, text: str, huffman_codes: dict):
+    def compressed_bits_length(self, text: str, huffman_codes: dict):
         return sum(len(huffman_codes[c]) for c in text)
 
     def __compress_bits_to_chars(self, buffer_dq: deque):
@@ -56,7 +56,7 @@ class OutputWriter:
     def write_compressed_data(self, huffman_codes: dict, file_name: str):
         input_reader = InputReader(file_name)
         input_reader.read_whole_file()
-        bits_length = self.__compressed_bits_length(input_reader.text, huffman_codes)
+        bits_length = self.compressed_bits_length(input_reader.text, huffman_codes)
         char_count, readable_from_last_char = bits_length // 8, bits_length % 8
 
         if (readable_from_last_char != 0):
@@ -82,6 +82,7 @@ class OutputWriter:
                 dq.append(0)
             self.__compress_bits_to_chars(dq)
         input_reader.close()
+        return char_count
 
     def close(self):
         self.file.write("".join(self.text_list))

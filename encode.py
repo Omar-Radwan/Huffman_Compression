@@ -16,6 +16,7 @@ class Encoder:
         self.frequency = {}
         self.huffman_codes = {}
         self.root_node = None
+        self.compressed_chars_count = 0
 
     def files_in_directory(self, path: str):
         fname = []
@@ -74,5 +75,6 @@ class Encoder:
         self.output_writer.write_huffman_codes(self.huffman_codes)
         for file_name in self.input_file_names:
             self.output_writer.write_path(file_name)
-            self.output_writer.write_compressed_data(self.huffman_codes, file_name)
+            self.compressed_chars_count += self.output_writer.write_compressed_data(self.huffman_codes, file_name)
+
         self.output_writer.close()
