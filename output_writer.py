@@ -18,16 +18,28 @@ class OutputWriter:
             self.file.write("".join(self.text_list))
             self.text_list = []
 
+    def __compact(self, code_str: str):
+        ret = []
+        dq = deque([int(c) for c in code_str])
+        while len(dq) > 0:
+            size = min(5, len(dq))
+            cur = size << 5
+            for shift in range(size - 1, -1, -1):
+                cur += (1 << shift) * dq.popleft()
+            ret.append(chr(cur))
+        return "".join(ret)
+
     def write_huffman_codes(self, huffman_codes: dict):
         pairs_list = []
         for key, value in huffman_codes.items():
-            pairs_list.append(key + value + DELIM)
+            pairs_list.append(key + self.__compact(value) + DELIM)
+
         length = self.__huffman_codes_length(huffman_codes)
         pairs_line = str(length) + DELIM + "".join(pairs_list)
         self.write_to_file(pairs_line)
 
     def __huffman_codes_length(self, huffman_codes: dict):
-        return 2 * len(huffman_codes) + sum(len(value) for value in huffman_codes.values())
+        return 2 * len(huffman_codes) + sum(((len(value)+4)//5) for value in huffman_codes.values())
 
     def write_path(self, path: str):
         line = "".join([str(len(path)), DELIM, path])

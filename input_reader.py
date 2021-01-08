@@ -22,6 +22,14 @@ class InputReader:
         self.read_so_far += path_characters
         return path
 
+    def __long_value(self, value_list, compact):
+        ascii_val = ord(compact)
+        size = ascii_val >> 5
+        for shift in range(size - 1, -1, -1):
+            pow = (1 << shift) & ascii_val
+            value_list.append('0') if (pow==0) else value_list.append('1')
+
+
     def read_meta_data(self) -> ({}, int):
         huffmanCodes = {}
         huffman_characters = self.get_length()
@@ -33,13 +41,13 @@ class InputReader:
             tmp = self.file.read(1)
             value_list = []
             while tmp != DELIM:
-                value_list.append(tmp)
+                self.__long_value(value_list, tmp)
                 self.read_so_far += 1
                 tmp = self.file.read(1)
             value = "".join(value_list)
             huffmanCodes[value] = key
             self.read_so_far += 1
-
+        print(huffmanCodes)
         return huffmanCodes
 
     def get_length(self):
