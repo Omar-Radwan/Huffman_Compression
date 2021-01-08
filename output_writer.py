@@ -78,6 +78,6 @@ class OutputWriter:
             self.__compress_bits_to_chars(buffer_dq)
 
     def close(self):
-        file = open(self.file_name, "w", encoding=ENCODING)
+        file = open(self.file_name, "w",newline='', encoding=ENCODING)
         file.write("".join(self.txt_list))
         file.close()

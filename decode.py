@@ -28,11 +28,11 @@ class Decoder:
             node.code = code
             return
         if code[pos_in_code] == '0':
-            if not node.left:
+            if node.left == None:
                 node.left = DecodeNode()
             self.__add_node_in_decode_tree(pos_in_code + 1, code, node.left, character)
         else:
-            if not node.right:
+            if node.right == None:
                 node.right = DecodeNode()
             self.__add_node_in_decode_tree(pos_in_code + 1, code, node.right, character)
 
@@ -51,7 +51,10 @@ class Decoder:
         # dowhile
         path, read_so_far = self.input_reader.read_path(read_so_far)
         while len(path) > 0:
-            output_writer = OutputWriter(f'dadaoda{path}')
+
+            # TODO: modify the output path
+            output_writer = OutputWriter(f'{path}.decoded.txt')
+
             compressed_length, last_bits, read_so_far = self.input_reader.read_compression_details(
                 read_so_far)
             bits, read_so_far = self.input_reader.get_compressed_bits(read_so_far, compressed_length, last_bits)
@@ -66,3 +69,4 @@ class Decoder:
                 path, read_so_far = self.input_reader.read_path(read_so_far)
             else:
                 path, read_so_far = "", read_so_far
+        self.input_reader.close()

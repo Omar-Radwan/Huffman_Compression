@@ -1,6 +1,9 @@
+import filecmp
 import heapq
+import random
 
 from decode import Decoder
+from misc import ENCODING
 from node import HuffmanNode, DecodeNode
 from collections import deque
 import ast
@@ -9,7 +12,7 @@ from encode import Encoder
 import os
 
 
-def dada(path:str):
+def dada(path: str):
     fname = []
     for root, directoryNames, fileNames in os.walk(path):
         for file in fileNames:
@@ -18,26 +21,41 @@ def dada(path:str):
     return fname
 
 
+def generate_testcase():
+    file1 = "./input.txt"
+    file2 = "./input.txt.txt"
+    chrs = []
+    for i in range(ord('a'), ord('z') + 1):
+        chrs.append(chr(i))
+
+    for i in range(ord('A'), ord('Z') + 1):
+        chrs.append(chr(i))
+
+    for i in range(ord('0'), ord('9') + 1):
+        chrs.append(chr(i))
+
+    while True:
+        x = []
+        for i in range(10000):
+            y = chr(random.randint(0,255))
+            x.append(str(y))
+        f = open("input.txt", "w",newline='', encoding=ENCODING)
+        f.write("".join(x))
+        f.close()
+        encoder = Encoder(dada("./dir"), "output.txt")
+        encoder.encode()
+        decoder = Decoder("output.txt")
+        decoder.decode_file()
+        if not (filecmp.cmp(file1, file2, shallow=False)):
+            break
+
+
 if __name__ == '__main__':
     # choice = int(input('1 - File\n2 - Folder\n'))
     # input_data = ['input.txt'] if choice == 1 else dada('./dir')
     # decoded_data =
-    encoder = Encoder(['input.txt'], "output.txt")
+    # generate_testcase()
+    encoder = Encoder(dada("./dir"), "output.txt")
     encoder.encode()
     decoder = Decoder("output.txt")
     decoder.decode_file()
-
-
-
-    """
-        Compressed File:
-            1.no. of characters in huffman codes+huffman codes     
-            2.no. of characters in path + path 
-            3.no. of characters in compressed data|no. or bits to read from last char|compressed data
-
-        any character that mustn't be added won't be added
-        40                              
-        number of chars to read k123 k123 k123 12 abc\\xyz\\a12 3 aksjdlkasjdlkasjdlksaalkasj        
-        size of dict = n
-        2n+sum(length of values)                             
-    """

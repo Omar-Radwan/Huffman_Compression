@@ -5,7 +5,7 @@ from misc import *
 class InputReader:
     def __init__(self, file_name):
         self.file_name = file_name
-        self.file = open(self.file_name, "r", encoding=ENCODING)
+        self.file = open(self.file_name, "r",newline='', encoding=ENCODING)
         self.text = self.file.read()
         self.file.close()
 
@@ -59,7 +59,6 @@ class InputReader:
         i += 1
         return length, i
 
-
     def get_compressed_bits(self, i, count, last_bits):
         characters = self.text[i:i + count - 1]
         bits = []
@@ -68,12 +67,14 @@ class InputReader:
             binary_string = char_to_binary(character)
             for bit in binary_string:
                 bits.append(bit)
-
+        # l ... r = r-l+1 = n  ... l,n -> r = l+n-1
         binary_string = char_to_binary(self.text[i + count - 1])
         for j in range(last_bits):
             bits.append(binary_string[j])
         return bits, i + count
 
+    def close(self):
+        self.file.close()
 # def fill_buffer(self, is_clear=True):
 #     if (is_clear):
 #         self.buffer.clear()
