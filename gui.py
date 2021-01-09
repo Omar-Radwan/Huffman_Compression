@@ -17,7 +17,7 @@ def makeLabel(rootObject,tk, text, row, column,padx,font):
              font=font,
              pady=10).grid(row=row, column=column, pady=10,padx=padx)
 
-def makeLabel2(rootObject,tk, text, row, column,padx,font):
+def makeLabelPack(rootObject,tk, text, row, column,padx,font):
     tk.Label(rootObject,
              text=text,
              justify=tk.CENTER,
@@ -36,7 +36,7 @@ class gui :
             self.operation = "compress"
         else:
             self.operation = "Decompress"
-        return self.path.get(), self.operation
+        return  self.operation
 
     def begin(self):
         makeLabel(root,tk,"Huffman Compression",1,2,50,70)
@@ -45,25 +45,28 @@ class gui :
                                                                                                    sticky=tk.W, pady=4)
         makeRadioButton(root,tk,"Compress",20,1,0)
         makeRadioButton(root,tk,"decompress",21,1,1)
-        tk.Button(root, text='Apply', command=self.start).grid(row=24, column=2, sticky=tk.W, pady=44)
+        tk.Button(root, text='Apply', command=self.check).grid(row=24, column=2, sticky=tk.W, pady=44)
 
         root.geometry("700x600")
         root.mainloop()
 
 
-    def start(self):
-        self.path,self.operation=self.apply()
-        root.destroy()
+    def check(self):
+        self.operation=self.apply()
+        if len(self.path.get())==0:
+            makeLabel(root,tk,"empty path",25,2,0,15)
+        else:
+            root.destroy()
 
 
     def displayOutput(self,ratio,time,huffmanCodes,operation):
         print(ratio)
         root2 = tk.Tk()
         if operation=="compress":
-            makeLabel2(root2, tk, "Compression ratio : %s " % (ratio), 26, 1, 0, 15)
-        makeLabel2(root2,tk,"Execution time : %s " % (time),27,1,0,15)
+            makeLabelPack(root2, tk, "Compression ratio : %s " % (ratio), 26, 1, 0, 15)
+        makeLabelPack(root2,tk,"Execution time : %s " % (time),27,1,0,15)
 
-        makeLabel2(root2, tk, "Huffman codes ", 28, 1, 0, 15)
+        makeLabelPack(root2, tk, "Huffman codes ", 28, 1, 0, 15)
         self.makeTable(huffmanCodes, root2,operation)
 
 
@@ -80,7 +83,7 @@ class gui :
         v.pack(side=RIGHT, fill=Y)
 
 
-        t = Text(root2, width=15, height=15, wrap=NONE,
+        t = Text(root2, width=15, height=20, wrap=NONE,
                  xscrollcommand=h.set,
                  yscrollcommand=v.set,
                  font=30)
