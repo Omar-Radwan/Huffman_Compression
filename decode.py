@@ -8,14 +8,18 @@ class Decoder:
     def __init__(self, inpute_file_name: str):
         self.input_reader = InputReader(inpute_file_name)
 
-    def inorder(self, node: DecodeNode):
+    def bfs(self, node: DecodeNode):
         if not node:
             return
-
-        self.inorder(node.left)
-        if not node.left and not node.right:
-            print(f'{node.character}  -->  {node.code}')
-        self.inorder(node.right)
+        queue = [node]
+        while len(queue) != 0:
+            cur = queue.pop(0)
+            if not cur.right and not cur.left:
+                print(f'{cur.character}  -->  {cur.code}')
+            if cur.left:
+                queue.append(cur.left)
+            if cur.right:
+                queue.append(cur.right)
 
     def build_decode_tree(self, huffman_codes: dict):
         self.decode_root = DecodeNode()
@@ -45,7 +49,7 @@ class Decoder:
     def decode(self):
         huffman_codes = self.input_reader.read_meta_data()
         self.build_decode_tree(huffman_codes)
-        self.inorder(self.decode_root)
+        self.bfs(self.decode_root)
         path = self.input_reader.read_path()
 
         while len(path) > 0:
