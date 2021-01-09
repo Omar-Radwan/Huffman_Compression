@@ -11,9 +11,7 @@ import ast
 from output_writer import OutputWriter
 from encode import Encoder
 import os
-
-
-
+from pathlib import Path
 
 def generate_testcase(length: int):
     file1 = "./input.txt"
@@ -33,8 +31,6 @@ def generate_testcase(length: int):
     return (filecmp.cmp(file1, file2, shallow=False))
 
 
-
-
 if __name__ == '__main__':
     # choice = int(input('1 - File\n2 - Folder\n'))
     # input_data = ['input.txt'] if choice == 1 else dada('./dir')
@@ -43,27 +39,24 @@ if __name__ == '__main__':
 
     file1 = "./input.txt"
     file2 = "./input.txt.decoded.txt"
-    sizeBeforeCompression=os.path.getsize("./input.txt")
-    sizeAfterCompression=os.path.getsize("./input.txt.compressed.txt")
-    print(sizeBeforeCompression)
-    #print(sizeAfterCompression)
 
     s1 = time.time()
     encoder = Encoder("./input.txt")
     encoder.encode()
     decoder = Decoder('./input.txt.compressed.txt')
+    print(f'encode_time={time.time() - s1}')
+    s2 = time.time()
+    decoder = Decoder("input.txt.compressed.txt")
     decoder.decode()
-    # print(f'encode_time={time.time() - s1}')
-    # s2 = time.time()
-    # decoder = Decoder("input.txt.compressed.txt")
-    # decoder.decode_file()
-    # print(f'decode_time={time.time() - s2}')
-    # print(f'total_time={time.time() - s1}')
-    #
-    # if not (filecmp.cmp(file1, file2, shallow=False)):
-    #     print("Bad")
-    # else:
-    #     print("Good")
+    print(f'decode_time={time.time() - s2}')
+    print(f'total_time={time.time() - s1}')
+
+    if not (filecmp.cmp(file1, file2, shallow=False)):
+        print("Bad")
+    else:
+        print("Good")
+    print(os.stat("./input.txt").st_size)
+    print(encoder.compressed_chars_count)
 # encoder = Encoder(dada("./dir"), "output.txt")
 # encoder.encode()
 # decoder = Decoder("output.txt")

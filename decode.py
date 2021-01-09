@@ -64,3 +64,4 @@ class Decoder:
 
 
         self.input_reader.close()
+        return huffman_codes
