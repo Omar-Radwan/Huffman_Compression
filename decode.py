@@ -59,7 +59,8 @@ class Decoder:
             slash_index = path.rfind("\\")
             if slash_index != -1:
                 dir_path = path[:slash_index]
-                os.makedirs(dir_path)
+                if not os.path.exists(dir_path):
+                    os.makedirs(dir_path)
             output_writer = OutputWriter(f'{path}.decoded.txt')
             compressed_length, last_bits = self.input_reader.read_compression_lengths()
 
