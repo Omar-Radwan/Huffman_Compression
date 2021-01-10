@@ -1,3 +1,5 @@
+import os
+
 from input_reader import InputReader
 from node import DecodeNode
 from output_writer import OutputWriter
@@ -49,10 +51,15 @@ class Decoder:
     def decode(self):
         huffman_codes = self.input_reader.read_meta_data()
         self.build_decode_tree(huffman_codes)
-        self.bfs(self.decode_root)
+        #self.bfs(self.decode_root)
         path = self.input_reader.read_path()
 
         while len(path) > 0:
+            # check if directory is there
+            slash_index = path.rfind("\\")
+            if slash_index != -1:
+                dir_path = path[:slash_index]
+                os.makedirs(dir_path)
             output_writer = OutputWriter(f'{path}.decoded.txt')
             compressed_length, last_bits = self.input_reader.read_compression_lengths()
 

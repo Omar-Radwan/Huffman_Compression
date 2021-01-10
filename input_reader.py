@@ -47,7 +47,7 @@ class InputReader:
             value = "".join(value_list)
             huffmanCodes[value] = key
             self.read_so_far += 1
-        print(huffmanCodes)
+        #print(huffmanCodes)
         return huffmanCodes
 
     def get_length(self):
