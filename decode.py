@@ -48,32 +48,44 @@ class Decoder:
         return self.read_character(bits, node.left) if (bits.popleft() == '0') else self.read_character(bits,
                                                                                                         node.right)
 
+    def create_path_if_it_dont_exist(self, path):
+        slash_index = path.rfind("\\")
+        if slash_index != -1:
+            dir_path = path[:slash_index]
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
+
+    def modify_name(self, path):
+        file_name = os.path.basename(path)
+        index_of_point = file_name.rfind('.')
+        if (index_of_point == -1):
+            input_path = file_name + '_decoded'
+        else:
+            input_path = file_name[0:index_of_point] + '_decoded' + file_name[index_of_point:]
+        return os.path.join(os.path.dirname(path), input_path)
+
     def decode(self):
         huffman_codes = self.input_reader.read_meta_data()
         self.build_decode_tree(huffman_codes)
-        #self.bfs(self.decode_root)
+        # self.bfs(self.decode_root)
         path = self.input_reader.read_path()
 
         while len(path) > 0:
             # check if directory is there
-            slash_index = path.rfind("\\")
-            if slash_index != -1:
-                dir_path = path[:slash_index]
-                if not os.path.exists(dir_path):
-                    os.makedirs(dir_path)
-            output_writer = OutputWriter(f'{path}.decoded.txt')
+            modified_path = self.modify_name(path)
+            self.create_path_if_it_dont_exist(modified_path)
+            output_writer = OutputWriter(modified_path)
             compressed_length, last_bits = self.input_reader.read_compression_lengths()
 
             bits = self.input_reader.get_compressed_bits(compressed_length, last_bits)
-
-            character = self.read_character(bits, self.decode_root)
-            output_writer.write_to_file(character)
+            if len(bits) != 0:
+                character = self.read_character(bits, self.decode_root)
+                output_writer.write_to_file(character)
             while len(bits) > 0:
                 character = self.read_character(bits, self.decode_root)
                 output_writer.write_to_file(character)
             output_writer.close()
             path = self.input_reader.read_path()
-
 
         self.input_reader.close()
         return huffman_codes

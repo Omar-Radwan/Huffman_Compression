@@ -2,7 +2,7 @@ from collections import deque
 from time import time
 
 from input_reader import InputReader
-from misc import *
+from constants import *
 
 
 class OutputWriter:
@@ -32,17 +32,17 @@ class OutputWriter:
     def write_huffman_codes(self, huffman_codes: dict):
         pairs_list = []
         for key, value in huffman_codes.items():
-            pairs_list.append(key + self.__compact(value) + DELIM)
+            pairs_list.append(key + self.__compact(value) + DELIMITER)
 
         length = self.__huffman_codes_length(huffman_codes)
-        pairs_line = str(length) + DELIM + "".join(pairs_list)
+        pairs_line = str(length) + DELIMITER + "".join(pairs_list)
         self.write_to_file(pairs_line)
 
     def __huffman_codes_length(self, huffman_codes: dict):
         return 2 * len(huffman_codes) + sum(((len(value)+4)//5) for value in huffman_codes.values())
 
     def write_path(self, path: str):
-        line = "".join([str(len(path)), DELIM, path])
+        line = "".join([str(len(path)), DELIMITER, path])
         self.write_to_file(line)
 
     def compressed_bits_length(self, text: str, huffman_codes: dict):
@@ -65,7 +65,7 @@ class OutputWriter:
         if readable_from_last_char == 0:
             readable_from_last_char = 8
 
-        line = "".join([str(char_count), DELIM, str(readable_from_last_char), DELIM])
+        line = "".join([str(char_count), DELIMITER, str(readable_from_last_char), DELIMITER])
         self.write_to_file(line)
         input_reader.close()
 

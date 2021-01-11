@@ -1,5 +1,5 @@
 from collections import deque
-from misc import *
+from constants import *
 
 
 class InputReader:
@@ -27,8 +27,7 @@ class InputReader:
         size = ascii_val >> 5
         for shift in range(size - 1, -1, -1):
             pow = (1 << shift) & ascii_val
-            value_list.append('0') if (pow==0) else value_list.append('1')
-
+            value_list.append('0') if (pow == 0) else value_list.append('1')
 
     def read_meta_data(self) -> ({}, int):
         huffmanCodes = {}
@@ -40,14 +39,13 @@ class InputReader:
             self.read_so_far += 1
             tmp = self.file.read(1)
             value_list = []
-            while tmp != DELIM:
+            while tmp != DELIMITER:
                 self.__long_value(value_list, tmp)
                 self.read_so_far += 1
                 tmp = self.file.read(1)
             value = "".join(value_list)
             huffmanCodes[value] = key
             self.read_so_far += 1
-        #print(huffmanCodes)
         return huffmanCodes
 
     def get_length(self):
@@ -56,7 +54,7 @@ class InputReader:
             return 0
 
         length_list = []
-        while tmp != DELIM:
+        while tmp != DELIMITER:
             length_list.append(tmp)
             self.read_so_far += 1
             tmp = self.file.read(1)
@@ -65,19 +63,20 @@ class InputReader:
         return length
 
     def get_compressed_bits(self, count, useful_bits_from_last_byte):
-        characters = self.file.read(count - 1)
         bits = deque([])
-
-
+        if count == 0:
+            return  bits
+        characters = self.file.read(count - 1)
         for character in characters:
-            binary_string = char_to_binary(character)
+            binary_string = '{0:08b}'.format(ord(character))
             for bit in binary_string:
                 bits.append(bit)
+        if (count >= 1):
+            binary_string = '{0:08b}'.format(ord(self.file.read(1)))
+            for useful_bits in range(useful_bits_from_last_byte):
+                bits.append(binary_string[useful_bits])
+            self.read_so_far += count
 
-        binary_string = char_to_binary(self.file.read(1))
-        for useful_bits in range(useful_bits_from_last_byte):
-            bits.append(binary_string[useful_bits])
-        self.read_so_far += count
         return bits
 
     def close(self):

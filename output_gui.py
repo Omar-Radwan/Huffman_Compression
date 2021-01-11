@@ -14,7 +14,6 @@ class OutputGui():
                  pady=10).pack()
 
     def displayOutput(self,ratio,time,huffmanCodes,operation):
-        print(ratio)
         root2 = tk.Tk()
         if operation=="compress":
             self.makeLabelPack(root2, tk, "Compression ratio : %s " % (ratio), 26, 1, 0, 15)

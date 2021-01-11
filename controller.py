@@ -8,19 +8,15 @@ import os
 class controller:
 
     def begin(self):
-        print("before")
         guiObject = gui()
         guiObject.begin()
-        print("after")
         operation = guiObject.operation
         if type(guiObject.pathh)!=str:
             path = guiObject.pathh.get()
-            self.solve(path, operation, guiObject)
+            self.solve(path, operation)
 
 
-
-
-    def solve(self,path,operation,guiObject):
+    def solve(self,path,operation):
         compression_ratio_object = compression_ratio()
         s1 = time.time()
         ratio = 0
@@ -32,7 +28,6 @@ class controller:
                 encoder.encode()
                 ratio = compression_ratio_object.getCompressionRatio(path, encoder)
                 huffmanCodes = encoder.huffman_codes
-                print(encoder.huffman_codes)
 
             else:
                 decoder = Decoder(path)
