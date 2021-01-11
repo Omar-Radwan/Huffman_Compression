@@ -32,10 +32,4 @@ def list_to_ascii(x: []):
     return result
 
 
-def char_to_binary(x: str) -> str:
-    """
-    :param x: some character
-    :return: binary representation of the input character
-    """
-    val = ord(x)
-    return '{0:08b}'.format(val)
+

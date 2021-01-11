@@ -13,51 +13,50 @@ from encode import Encoder
 import os
 from pathlib import Path
 
+
+def fill_choices():
+    result = ['\n', '\r']
+    for i in range(ord('a'), ord('z') + 1):
+        result.append(chr(i))
+    # for i in range(ord('A'), ord('Z') + 1):
+    #     result.append(chr(i))
+    for i in range(ord('0'), ord('9') + 1):
+        result.append(chr(i))
+    return result
+
+
 def generate_testcase(length: int):
-    file1 = "./input.txt"
-    file2 = "./input.txt.decoded.txt"
+    s1 = time.time()
+    input_file = "input.txt"
+    compressed_file = "input_compressed.txt"
+    decoded_file = "input_decoded.txt"
     x = []
-    length *= MB_SIZE
+    # length *= KB_SIZE
+    choices = fill_choices()
     for i in range(length):
-        y = chr(random.randint(0, 255))
+        y = random.choice(choices)
         x.append(str(y))
-    f = open("input.txt", "w", newline='', encoding=ENCODING)
+    f = open(input_file, "w", newline='', encoding=ENCODING)
     f.write("".join(x))
     f.close()
-    encoder = Encoder(["input.txt"], "output.txt")
+    encoder = Encoder(input_file)
     encoder.encode()
-    decoder = Decoder("output.txt")
+    decoder = Decoder(compressed_file)
     decoder.decode()
-    return (filecmp.cmp(file1, file2, shallow=False))
+    print(f'Generated case in: {(time.time() - s1)}')
+    return (filecmp.cmp(input_file, decoded_file, shallow=False))
+
+
+def test_till_failure():
+    ans = generate_testcase(100)
+    while ans:
+        ans = generate_testcase(100)
 
 
 if __name__ == '__main__':
-    # choice = int(input('1 - File\n2 - Folder\n'))
-    # input_data = ['input.txt'] if choice == 1 else dada('./dir')
-    # decoded_data =
-    # generate_testcase()
 
-    file1 = "./input.txt"
-    file2 = "./input.txt.decoded.txt"
-
-    s1 = time.time()
-    encoder = Encoder("./input.txt")
-    encoder.encode()
-    decoder = Decoder('./input.txt.compressed.txt')
-    print(f'encode_time={time.time() - s1}')
-    s2 = time.time()
-    decoder = Decoder("input.txt.compressed.txt")
+    # encoder = Encoder("dir")
+    # encoder.encode()
+    decoder = Decoder("dir_compressed.txt")
     decoder.decode()
-    print(f'decode_time={time.time() - s2}')
-    print(f'total_time={time.time() - s1}')
-
-    if not (filecmp.cmp(file1, file2, shallow=False)):
-        print("Bad")
-    else:
-        print("Good")
-    print(os.stat("./input.txt").st_size)
-    print(encoder.compressed_chars_count)
-# encoder = Encoder(dada("./dir"), "output.txt")
-# encoder.encode()
-# decoder = Decoder("output.txt")
-# decoder.decode_file()
+# TODO: division by zero error
