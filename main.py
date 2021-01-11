@@ -4,7 +4,7 @@ import random
 import time
 
 from decode import Decoder
-from misc import ENCODING, MB_SIZE, KB_SIZE
+from constants import ENCODING, MB_SIZE, KB_SIZE
 from node import HuffmanNode, DecodeNode
 from collections import deque
 import ast
@@ -54,9 +54,9 @@ def test_till_failure():
 
 
 if __name__ == '__main__':
-
-    # encoder = Encoder("dir")
+    # test_till_failure()
+    # encoder = Encoder("one_char.txt")
     # encoder.encode()
-    decoder = Decoder("dir_compressed.txt")
+    decoder = Decoder("one_char_compressed.txt")
     decoder.decode()
 # TODO: division by zero error

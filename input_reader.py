@@ -1,5 +1,5 @@
 from collections import deque
-from misc import *
+from constants import *
 
 
 class InputReader:
@@ -39,7 +39,7 @@ class InputReader:
             self.read_so_far += 1
             tmp = self.file.read(1)
             value_list = []
-            while tmp != DELIM:
+            while tmp != DELIMITER:
                 self.__long_value(value_list, tmp)
                 self.read_so_far += 1
                 tmp = self.file.read(1)
@@ -54,7 +54,7 @@ class InputReader:
             return 0
 
         length_list = []
-        while tmp != DELIM:
+        while tmp != DELIMITER:
             length_list.append(tmp)
             self.read_so_far += 1
             tmp = self.file.read(1)

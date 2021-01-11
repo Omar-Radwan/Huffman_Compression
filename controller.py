@@ -23,14 +23,12 @@ class controller:
         s1 = time.time()
         ratio = 0
 
-
         if len(path) != 0 and os.path.exists(path) and os.stat(path).st_size != 0 :
             if operation == "compress":
                 encoder = Encoder(path)
                 encoder.encode()
                 ratio = compression_ratio_object.getCompressionRatio(path, encoder)
                 huffmanCodes = encoder.huffman_codes
-                print(encoder.huffman_codes)
 
             else:
                 decoder = Decoder(path)
