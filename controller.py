@@ -13,17 +13,20 @@ class controller:
         guiObject.begin()
         print("after")
         operation = guiObject.operation
-        path = guiObject.pathh.get()
-        self.solve(path,operation)
+        if type(guiObject.pathh)!=str:
+            path = guiObject.pathh.get()
+            self.solve(path, operation, guiObject)
 
 
 
-    def solve(self,path,operation):
+
+    def solve(self,path,operation,guiObject):
         compression_ratio_object = compression_ratio()
         s1 = time.time()
         ratio = 0
 
-        if len(path) != 0:
+
+        if len(path) != 0 and os.path.exists(path) and os.stat(path).st_size != 0 and operation!="" :
             if operation == "compress":
                 encoder = Encoder(path)
                 encoder.encode()
@@ -37,15 +40,10 @@ class controller:
 
             totalTime = time.time() - s1
             print(f'time={time.time() - s1}')
-            # interfaceGuiObject = interfaceGui(ratio, totalTime, huffmanCodes, operation)
             output = OutputGui()
             output.displayOutput(ratio, totalTime, huffmanCodes, operation)
             if output.again:
                 self.begin()
-
-        else:
-            print("empty file")
-
 
 
 

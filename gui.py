@@ -1,6 +1,8 @@
 import tkinter as tk
+from sys import path
 from tkinter import *
-
+from tkinter import messagebox
+import os
 
 def makeRadioButton(rootObject,tk, text, row, column, value,method):
     tk.Radiobutton(rootObject, text=text, indicatoron=1, width=0, padx=60, variable=method, value=value). \
@@ -31,7 +33,7 @@ class gui :
 
         if method.get() == 0:
             self.operation = "compress"
-        else:
+        elif method.get()==1:
             self.operation = "Decompress"
         return  self.operation
 
@@ -39,22 +41,29 @@ class gui :
         root = tk.Tk()
         method = tk.IntVar()
         method.set(2)
-        path = tk.StringVar()
+        path_input = tk.StringVar()
 
         makeLabel(root,tk,"Huffman Compression",1,2,50,70)
         makeLabel(root,tk,"Enter name of the file/folder :",10,1,0,20)
-        name_entry = tk.Entry(root, textvariable=path, font=('calibre', 10, 'normal'),width=40).grid(row=10, column=2,
+        name_entry = tk.Entry(root, textvariable=path_input, font=('calibre', 10, 'normal'),width=40).grid(row=10, column=2,
                                                                                                    sticky=tk.W, pady=4)
         makeRadioButton(root,tk,"Compress",20,1,0,method)
         makeRadioButton(root,tk,"decompress",21,1,1,method)
-        tk.Button(root, text='Apply', command=lambda: checkk()).grid(row=24, column=2, sticky=tk.W, pady=44)
+        tk.Button(root, text='Apply', command=lambda: check()).grid(row=24, column=2, sticky=tk.W, pady=44)
 
-        def checkk():
+        def check():
             self.operation = self.apply(method)
-            self.pathh=path
-            print(type(self.pathh))
-            if len(path.get()) == 0:
-                makeLabel(root, tk, "empty path", 25, 2, 0, 15)
+            self.pathh=path_input
+            if len(path_input.get()) == 0:
+                messagebox.showinfo("Error", "path is empty")
+            elif not os.path.exists(path_input.get()):
+                messagebox.showinfo("Error", "path doesn't exist")
+            elif os.stat(path_input.get()).st_size == 0:
+                messagebox.showinfo("Error", "file is empty")
+            elif self.operation=="":
+                messagebox.showinfo("Error", "You must choose compress or decompress")
+
+
             else:
                 root.destroy()
 
@@ -64,5 +73,8 @@ class gui :
 
 
 
+
+    def alert(self):
+        messagebox.showinfo("Error", "file is empty")
 
 
