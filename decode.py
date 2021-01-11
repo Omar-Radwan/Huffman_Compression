@@ -1,3 +1,5 @@
+import os
+
 from input_reader import InputReader
 from node import DecodeNode
 from output_writer import OutputWriter
@@ -8,14 +10,18 @@ class Decoder:
     def __init__(self, inpute_file_name: str):
         self.input_reader = InputReader(inpute_file_name)
 
-    def inorder(self, node: DecodeNode):
+    def bfs(self, node: DecodeNode):
         if not node:
             return
-
-        self.inorder(node.left)
-        if not node.left and not node.right:
-            print(f'{node.character}  -->  {node.code}')
-        self.inorder(node.right)
+        queue = [node]
+        while len(queue) != 0:
+            cur = queue.pop(0)
+            if not cur.right and not cur.left:
+                print(f'{cur.character}  -->  {cur.code}')
+            if cur.left:
+                queue.append(cur.left)
+            if cur.right:
+                queue.append(cur.right)
 
     def build_decode_tree(self, huffman_codes: dict):
         self.decode_root = DecodeNode()
@@ -45,10 +51,16 @@ class Decoder:
     def decode(self):
         huffman_codes = self.input_reader.read_meta_data()
         self.build_decode_tree(huffman_codes)
-        self.inorder(self.decode_root)
+        #self.bfs(self.decode_root)
         path = self.input_reader.read_path()
 
         while len(path) > 0:
+            # check if directory is there
+            slash_index = path.rfind("\\")
+            if slash_index != -1:
+                dir_path = path[:slash_index]
+                if not os.path.exists(dir_path):
+                    os.makedirs(dir_path)
             output_writer = OutputWriter(f'{path}.decoded.txt')
             compressed_length, last_bits = self.input_reader.read_compression_lengths()
 
