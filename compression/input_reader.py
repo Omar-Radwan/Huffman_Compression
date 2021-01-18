@@ -1,5 +1,5 @@
 from collections import deque
-from constants import *
+from misc.constants import *
 
 
 class InputReader:

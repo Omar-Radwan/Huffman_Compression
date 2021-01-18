@@ -1,9 +1,9 @@
 import heapq
 import os
 
-from input_reader import InputReader
-from node import HuffmanNode, DecodeNode
-from output_writer import OutputWriter
+from compression.input_reader import InputReader
+from misc.node import HuffmanNode
+from compression.output_writer import OutputWriter
 
 
 class Encoder:

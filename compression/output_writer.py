@@ -1,8 +1,7 @@
 from collections import deque
-from time import time
 
-from input_reader import InputReader
-from constants import *
+from compression.input_reader import InputReader
+from misc.constants import *
 
 
 class OutputWriter:

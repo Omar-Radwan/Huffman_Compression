@@ -1,9 +1,8 @@
 import os
 
-from input_reader import InputReader
-from node import DecodeNode
-from output_writer import OutputWriter
-from collections import deque
+from compression.input_reader import InputReader
+from misc.node import DecodeNode
+from compression.output_writer import OutputWriter
 
 
 class Decoder:
